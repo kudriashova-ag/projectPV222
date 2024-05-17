@@ -96,5 +96,6 @@ while($file = readdir($dir)){
     echo $file . '<br>';
 }
 closedir($dir); */
+
 $files = glob(__DIR__ . '/../uploads-img/*{jpeg,jpg,gif,png,webp,avif}', GLOB_BRACE);
 dump($files);

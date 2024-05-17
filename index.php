@@ -30,6 +30,9 @@ require_once "./functions/helpers.php";
                     <li class="nav-item">
                         <a class="nav-link" href="/uploads">Uploads</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reviews">Reviews</a>
+                    </li>
                 </ul>
             </div>
         </div>
