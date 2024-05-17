@@ -25,16 +25,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     move_uploaded_file($tmp_name, $dir . '/' . $fName);
-    resizeImage($dir . '/' . $fName, 100, true);
-    resizeImage($dir . '/' . $fName, 300, false);
+    resizeImage($dir . '/' . $fName, 100, true, 'uploads-img/small');
+    resizeImage($dir . '/' . $fName, 300, false, 'uploads-img/big');
     $_SESSION['message'] = ['File is uploaded', 'success'];
     //redirect('uploads');
 }
 
 
-function resizeImage(string $path, int $size, bool $crop)
+function resizeImage(string $path, int $size, bool $crop, string $pathToSave)
 {
-    $src = imagecreatefromjpeg($path);
+    extract(pathinfo($path));
+    $functionCreate = 'imagecreatefrom' . ($extension === 'jpg' ? 'jpeg' : $extension);
+    $src = $functionCreate($path);
     list($src_width, $src_height) = getimagesize($path);
 
     if($crop){
@@ -55,8 +57,11 @@ function resizeImage(string $path, int $size, bool $crop)
         $dest = imagecreatetruecolor($dest_width, $dest_height);
         imagecopyresampled($dest, $src, 0, 0, 0, 0,$dest_width, $dest_height, $src_width, $src_height);
     }
-
-    imagejpeg($dest, 'uploads-img/1.jpg', 100);
+    $functionSave = 'image' . ($extension === 'jpg' ? 'jpeg' : $extension);
+    if(!file_exists($pathToSave)){
+        mkdir($pathToSave);
+    }
+    $functionSave($dest, "$pathToSave/$basename");
 }
 ?>
 
@@ -75,16 +80,21 @@ if (isset($_SESSION['message'])) {
 </form>
 
 
-<!-- 
+<?php 
+// $files = scandir('uploads-img');
+// $files = array_diff($files, ['.', '..']);
+// foreach($files as $file){
+//     if(!is_dir("uploads-img/$file")){
+//         echo "<img src='uploads-img/$file' alt='$file' style='width: 200px'>";
+//     }
+// }
 
-Array
-(
-    [name] => js.jpg
-    [full_path] => js.jpg
-    [type] => image/jpeg
-    [tmp_name] => C:\OSPanel\userdata\temp\upload\php673C.tmp
-    [error] => 0
-    [size] => 7915
-)
+// dump($files);
 
- -->
+/* $dir = opendir('uploads-img');
+while($file = readdir($dir)){
+    echo $file . '<br>';
+}
+closedir($dir); */
+$files = glob(__DIR__ . '/../uploads-img/*{jpeg,jpg,gif,png,webp,avif}', GLOB_BRACE);
+dump($files);
